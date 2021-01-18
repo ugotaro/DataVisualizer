@@ -1,0 +1,54 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:UGO.Utility"
+        xmlns:View="clr-namespace:UGO.View" x:Class="UGO.Utility.ImageView"
+        mc:Ignorable="d"
+        Title="ImageView" Height="400" Width="585.255" Closed="Window_Closed">
+    <Grid>
+        <ScrollViewer Margin="10,60,160,35" IsManipulationEnabled="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel" PreviewMouseRightButtonDown="ScrollViewer_PreviewMouseRightButtonDown" PreviewMouseMove="ScrollViewer_PreviewMouseMove" PreviewMouseRightButtonUp="ScrollViewer_PreviewMouseRightButtonUp" MouseLeave="ScrollViewer_MouseLeave">
+            <Grid x:Name="imageGrid">
+                <View:CustomImage x:Name="image" MouseMove="Image_MouseMove" MouseLeftButtonDown="Image_MouseLeftButtonDown" MouseLeftButtonUp="Image_MouseLeftButtonUp" MouseLeave="Image_MouseLeave"/>
+                <Canvas x:Name="canvas"/>
+            </Grid>
+        </ScrollViewer>
+        <Slider Height="20" Margin="10,0,40,10" VerticalAlignment="Bottom" x:Name="imageSlider" ValueChanged="ImageSlider_ValueChanged" SmallChange="1"/>
+        <Label x:Name="numberLabel" Content="0" HorizontalAlignment="Right" Margin="0,0,10,9" VerticalAlignment="Bottom" Width="25"/>
+        <Button x:Name="saveButton" Content="Save" HorizontalAlignment="Right" Margin="0,10,10.2,0" VerticalAlignment="Top" Width="65" Click="saveButton_Click" RenderTransformOrigin="0.597,1.498" Height="28"/>
+
+        <GroupBox Header="Image Properties" HorizontalAlignment="Right" Height="292" Margin="0,43,10.2,0" VerticalAlignment="Top" Width="145">
+            <Grid>
+                <Label Content="Min" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
+                <TextBox Height="23" Margin="0,12,9.8,0" TextWrapping="Wrap" Text="{Binding MinValue, StringFormat={}{0:0.##}, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" HorizontalAlignment="Right" Width="55"/>
+                <Slider x:Name="contrastMinSlider" Value="{Binding SliderMin}" Margin="10,41,9.8,0" VerticalAlignment="Top" Maximum="255" ValueChanged="Slider_ValueChanged" SmallChange="1"/>
+                <Label Content="Max" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" Width="43"/>
+                <TextBox HorizontalAlignment="Right" Height="23" Margin="0,67,9.8,0" TextWrapping="Wrap" Text="{Binding MaxValue, StringFormat={}{0:0.##}, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Top" Width="56"/>
+                <Slider x:Name="contrastMaxSlider" Value="{Binding SliderMax}" Margin="9,95,9.8,0" VerticalAlignment="Top" Maximum="255" ValueChanged="Slider_ValueChanged" SmallChange="1"/>
+                <CheckBox Content="Keep Min-Max" HorizontalAlignment="Right" Margin="0,118,9.8,0" VerticalAlignment="Top" Width="114" FontSize="12" VerticalContentAlignment="Center" IsChecked="{Binding IsKeepChecked}"/>
+                <ComboBox x:Name="imageProcessType" HorizontalAlignment="Right" Margin="0,220,9.8,0" VerticalAlignment="Top" Width="114" SelectedIndex="0" SelectionChanged="imageProcessType_SelectionChanged">
+                    <ComboBoxItem Content="Normal"/>
+                    <ComboBoxItem Content="FFT Abs"/>
+                    <ComboBoxItem Content="FFT Power"/>
+                </ComboBox>
+                <Label Content="Post Processing" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top"/>
+                <Button x:Name="resetContrastInformation" Content="Reset" HorizontalAlignment="Left" Height="22" Margin="68,138,0,0" VerticalAlignment="Top" Width="55" Click="resetContrastInformation_Click"/>
+                <CheckBox x:Name="logProcess_box" Content="Log10" HorizontalAlignment="Left" Margin="67,247,0,0" VerticalAlignment="Top" Checked="logProcess_box_Checked" Unchecked="logProcess_box_Checked" RenderTransformOrigin="0.5,0.5" Width="56"/>
+            </Grid>
+        </GroupBox>
+        <CheckBox x:Name="hCrossSectionBox" Content="H Crosssection" HorizontalAlignment="Left" Margin="10,17,0,0" VerticalAlignment="Top" Checked="hCrossSectionBox_Checked"/>
+        <CheckBox x:Name="vCrossSectionBox" Content="V Crosssection" HorizontalAlignment="Left" Margin="10,37,0,0" VerticalAlignment="Top" Checked="vCrossSectionBox_Checked"/>
+        <Button x:Name="resetViewButton" Content="Zoom Reset" HorizontalAlignment="Left" Margin="424,10,0,0" VerticalAlignment="Top" Width="75" Click="resetViewButton_Click" Height="28"/>
+        <GroupBox x:Name="channelGroup" Header="Channel" HorizontalAlignment="Left" Height="45" Margin="314,10,0,0" VerticalAlignment="Top" Width="105" Visibility="Visible">
+            <Grid>
+                <StackPanel Orientation="Horizontal" Margin="2">
+                    <RadioButton x:Name="RButton" Content="R" Margin="1" Checked="RButton_Checked"/>
+                    <RadioButton x:Name="GButton" Content="G" Margin="1" Checked="RButton_Checked"/>
+                    <RadioButton x:Name="BButton" Content="B" Margin="1" Checked="RButton_Checked"/>
+                </StackPanel>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>
