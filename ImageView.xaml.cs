@@ -10,6 +10,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
+
+
 namespace UGO.Utility
 {
     /// <summary>
@@ -273,6 +275,80 @@ namespace UGO.Utility
             }));
         }
 
+        public void SetNewImage(OpenCvSharp.Mat image)
+        {
+            ImageWidth = image.Width;
+            ImageHeight = image.Height;
+            if(image.Channels() == 3)
+            {
+                for (int col = 0;col < 3; col++)
+                {
+                    double[] data = new double[ImageWidth * ImageHeight];
+
+                    for (int y = 0; y < ImageHeight; y++)
+                    {
+                        for (int x = 0; x < ImageWidth; x++)
+                        {
+                            data[x + y * ImageWidth] = image.At<OpenCvSharp.Vec3b>(y, x)[col];
+                        }
+                    }
+
+                    lastImageData[col + 1] = data;
+                    var channel = (CustomImage.ChannelType)(col + 1);
+                    Dispatcher.Invoke(new Action(() =>
+                    {
+                        try
+                        {
+                            UpdateImage(channel);
+                            if (channel != CustomImage.ChannelType.BlackWhite)
+                            {
+                                channelGroup.Visibility = Visibility.Visible;
+                                if (CurrentChannel == CustomImage.ChannelType.BlackWhite)
+                                {
+                                    RButton.IsChecked = true;
+                                }
+                            }
+                            imageSlider.Visibility = Visibility.Collapsed;
+                            numberLabel.Visibility = Visibility.Collapsed;
+                        }
+                        catch { }
+                    }));
+                }
+            }
+            else
+            {
+                double[] data = new double[ImageWidth * ImageHeight];
+                for (int y = 0;y < ImageHeight; y++)
+                {
+                    for(int x = 0; x < ImageWidth; x++)
+                    {
+                        data[x + y * ImageWidth] = image.At<byte>(y, x);
+                    }
+                }
+                lastImageData[(int)CustomImage.ChannelType.BlackWhite] = data;
+                var channel = CustomImage.ChannelType.BlackWhite;
+                Dispatcher.Invoke(new Action(() =>
+                {
+                    try
+                    {
+                        UpdateImage(channel);
+                        if (channel != CustomImage.ChannelType.BlackWhite)
+                        {
+                            channelGroup.Visibility = Visibility.Visible;
+                            if (CurrentChannel == CustomImage.ChannelType.BlackWhite)
+                            {
+                                RButton.IsChecked = true;
+                            }
+                        }
+                        imageSlider.Visibility = Visibility.Collapsed;
+                        numberLabel.Visibility = Visibility.Collapsed;
+                    }
+                    catch { }
+                }));
+            }
+
+        }
+
         public void SetExtraInformation(String ExtraInformationArg) // is dispayed in the image and saved when saved
         {
             ExtraInformation = ExtraInformationArg;  // is this reallcopied or jsut a reference?
@@ -315,6 +391,76 @@ namespace UGO.Utility
             }));
         }
 
+
+        public void AddImage(OpenCvSharp.Mat image)
+        {
+            ImageWidth = image.Width;
+            ImageHeight = image.Height;
+            if (image.Channels() == 3)
+            {
+                double[][] rgbdata = new double[3][];
+                for (int col = 0; col < 3; col++)
+                {
+                    rgbdata[col] = new double[ImageWidth * ImageHeight];
+                    for (int y = 0; y < ImageHeight; y++)
+                    {
+                        for (int x = 0; x < ImageWidth; x++)
+                        {
+                            rgbdata[col][x + y * ImageWidth] = image.At<OpenCvSharp.Vec3b>(y, x)[col];
+                        }
+                    }
+
+                    lastImageData[col + 1] = rgbdata[col];
+                }
+
+
+                imageDataArray.Add(new Tuple<double[][], int, int>(rgbdata, image.Width, image.Height));
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        CurrentChannel = CustomImage.ChannelType.B;
+                        channelGroup.Visibility = Visibility.Collapsed;
+                        UpdateImage(CustomImage.ChannelType.B);
+                        imageSlider.Minimum = 0;
+                        imageSlider.Maximum = imageDataArray.Count - 1;
+                        imageSlider.Value = imageSlider.Maximum;
+                        imageSlider.Visibility = Visibility.Visible;
+                        numberLabel.Visibility = Visibility.Visible;
+                    }
+                    catch { }
+                }));
+            }
+            else
+            {
+                double[] data = new double[ImageWidth * ImageHeight];
+                for (int y = 0; y < ImageHeight; y++)
+                {
+                    for (int x = 0; x < ImageWidth; x++)
+                    {
+                        data[x + y * ImageWidth] = image.At<byte>(y, x);
+                    }
+                }
+
+                imageDataArray.Add(new Tuple<double[][], int, int>(new double[][] { data, null, null, null }, image.Width, image.Height));
+                lastImageData[0] = data;
+                Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    try
+                    {
+                        CurrentChannel = CustomImage.ChannelType.BlackWhite;
+                        channelGroup.Visibility = Visibility.Collapsed;
+                        UpdateImage(CustomImage.ChannelType.BlackWhite);
+                        imageSlider.Minimum = 0;
+                        imageSlider.Maximum = imageDataArray.Count - 1;
+                        imageSlider.Value = imageSlider.Maximum;
+                        imageSlider.Visibility = Visibility.Visible;
+                        numberLabel.Visibility = Visibility.Visible;
+                    }
+                    catch { }
+                }));
+            }
+        }
         double[][] lastImageData = new double[4][];
         double[][] lastPostProcessData = new double[4][];
         private void UpdateImage(CustomImage.ChannelType channel)
